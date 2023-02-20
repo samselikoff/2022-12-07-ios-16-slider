@@ -57,9 +57,17 @@ export default function Page() {
                 onPointerEnter={() => setHovered(true)}
                 onPointerLeave={() => setHovered(false)}
                 onPan={(event, info) => {
-                  let deltaInPercent = info.delta.x / bounds.width;
-                  let newPercent = clamp(progress.get() + deltaInPercent, 0, 1);
-                  progress.set(newPercent);
+                  const previousPercent = progress.get();
+                  const deltaInPercent = info.delta.x / bounds.width;
+                  const difference =
+                    previousPercent + deltaInPercent - previousPercent;
+                  const scalingFactor = 1 + Math.abs(difference) * 6;
+                  const newPercentWithInertia = clamp(
+                    previousPercent + deltaInPercent * scalingFactor,
+                    0,
+                    1
+                  );
+                  progress.set(newPercentWithInertia);
                 }}
                 style={{ height: height + buffer }}
                 className="flex items-center justify-center relative touch-none grow-0"
